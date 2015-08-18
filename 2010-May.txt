@@ -1,0 +1,364 @@
+From yosefm at gmail.com  Thu May 20 07:06:46 2010
+From: yosefm at gmail.com (Yosef Meller)
+Date: Thu, 20 May 2010 08:06:46 +0300
+Subject: [Tracer-user] Announcing Tracer v0.2
+Message-ID: <AANLkTikuwFXq6do8NpgSKsXLJ0IaYF8vUoAHCJSGAU3k@mail.gmail.com>
+
+This is a one-time message to announce the availability of version 0.2
+of the Tracer package.
+
+About
+---------
+Tracer is a ray-tracing package for Python. It is geared toward solar
+energy research; written for extensibility and scriptability, it is
+particularly suitable for use together with optimization programs, but
+your imagination is the limit.
+
+Tracer is free-software, distributed under the GPL v3.0 license. You
+are free to use, review the code or help improve it.
+
+Features
+-------------
+The package contains two parts: a set of modules for building and
+running ray tracing scenes; and a set of pre-assembled models.
+
+The scene construction part provides:
+
+* Assemblies of arbitrary complexity
+* Surfaces with flat, spherical, cylindrical (new in v0.2) or
+paraboloidal shapes; API for developing other shapes.
+* Surface materials with specular-reflective or refractive surfaces;
+API for developing more complex models
+* Receiver surfaces for output collection.
+
+The models included in the second part:
+
+* One-side mirror
+* Rectangular kaleidoscope light-guide
+* Parabolic dishes with circular or hexagonal apertures.
+* Heliostats field (new in v0.2).
+* Spherical lens - any plano/convex/concave combination (new in v0.2).
+
+In addition, the package contains basic tools for GUI generation using
+MayaVi (new in v0.2).
+
+More information
+-------------------------
+Project website: http://tracer.berlios.de/
+Project mailing list: https://lists.berlios.de/mailman/listinfo/tracer-user
+
+
+From yosefm at gmail.com  Sun May 23 15:43:30 2010
+From: yosefm at gmail.com (Yosef Meller)
+Date: Sun, 23 May 2010 16:43:30 +0300
+Subject: [Tracer-user] Tracer v0.2
+In-Reply-To: <AANLkTinNY3wCNAjn55YgWwmQO-Lo31V415X3-iStnat2@mail.gmail.com>
+References: <AANLkTinNY3wCNAjn55YgWwmQO-Lo31V415X3-iStnat2@mail.gmail.com>
+Message-ID: <AANLkTinQI_V5y-5tuVR2X9h0HF6QrriLb6vNLG-dOele@mail.gmail.com>
+
+Continuing the conversation on the mailing list, as we agreed.
+
+On the geometry side, I see two designs: one with rectangular
+surfaces, which can be done by code already in Tracer (I assume that
+these surfaces are flat); the other has (I think) a rhombus shape,
+which will need to be programmed, but it's not too hard, you can take
+a look at tracer.flat_surface.RectPlate to see what it takes.
+
+If you need the surfaces enclosing the splitter, they look like they
+are some polygons for which a flat polygon geometry needs to be
+written - basically write a point-in-polygon function (I have
+references for you) and use it to vett out points from those hitting
+an infinite flat surface, like what's being done in RectPlate.
+
+Optics: it looks like you are looking for refractive surfaces, am I
+right? In that case, if the dependence on wavelength can be neglected,
+you have what you need in Tracer. Otherwise, it will be a bit of work
+to extend optics_callables.Refractive and RayBundle, but not too big a
+deal.
+
+Once you have the geometry and optics for the surfaces, all the rest
+is ready, you just need to assemble it to surfaces and an optical
+object, in the process described here:
+http://tracer.berlios.de/opt_sys_construct.html
+
+If you have a publicly accessible version of your Matlab code, I can
+take a look.
+
+Yours,
+Yosef.
+
+On Sat, May 22, 2010 at 8:27 PM, Alex Liberzon <alexlib at eng.tau.ac.il> wrote:
+> Dear Yossef,
+> Great job is your Tracer?http://tracer.berlios.de/
+> I discussed with Mark some time ago your 1st version and it seems that we
+> can make great use of your project for our needs The project we're pushing
+> through is related to the optical system for the particle tracking system,
+> in which we need what we call 'four-view-image-splitter'. Could you please,
+> take a look at the attached images and tell me if you see how quickly we
+> could adopt your package for our needs? Our matlab toolbox does it's job but
+> it's a bit cumbersome and not as professionally written as yours.
+> http://picasaweb.google.com/alex.tkfx/ImageSplitter02#
+>
+> Thanks,
+> Alex
+> --
+> Alex Liberzon
+> Turbulence Structure Laboratory (http://www.eng.tau.ac.il/efdl)
+> School of Mechanical Engineering
+> Tel Aviv University
+> Tel: +972-3-640-8928 (office)
+> Tel: +972-3-640-6860 (lab)
+> E-mail: alexlib at eng.tau.ac.il
+>
+
+
+From alexlib at eng.tau.ac.il  Mon May 24 19:35:06 2010
+From: alexlib at eng.tau.ac.il (Alex Liberzon)
+Date: Mon, 24 May 2010 20:35:06 +0300
+Subject: [Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+In-Reply-To: <mailman.53.1274695208.30415.tracer-user@lists.berlios.de>
+References: <mailman.53.1274695208.30415.tracer-user@lists.berlios.de>
+Message-ID: <AANLkTimu0nUV7ZxOGmZADoQW5dFQWRsxszYkZMc1rm8x@mail.gmail.com>
+
+Dear Yosef,
+
+Thanks for the quick reply.
+
+Regarding the system we're looking at - everything is built from flat
+surfaces. the so-called 'rhombus' shape is also a combination of 4 flat
+surfaces that are just aligned at specific angles.
+
+What we need is actually some help to design the first prototype - the
+tutorial is not helpful for us at the present level. If you'll have a demo
+that shows a list of the following items:
+
+1. a point source of light, monochromatic, a point from which the ray comes
+out.
+2. a first mirror that sees the light at some angle (back mirrors)
+3. a second mirror that sees the first mirror (one of the four surfaces on
+the rhombic surface)
+4. a light detector (a camera).
+
+Then our design is actually a replication of this design 4 times, when every
+time the point source is coming from another corner of a rectangle and what
+we want to see is the point where the light hits when it originates from the
+four different corners of the rectangle.
+
+Thanks in advance,
+Alex
+
+
+On Mon, May 24, 2010 at 1:00 PM, <tracer-user-request at lists.berlios.de>wrote:
+
+> Send Tracer-user mailing list submissions to
+>        tracer-user at lists.berlios.de
+>
+> To subscribe or unsubscribe via the World Wide Web, visit
+>        https://lists.berlios.de/mailman/listinfo/tracer-user
+> or, via email, send a message with subject or body 'help' to
+>        tracer-user-request at lists.berlios.de
+>
+> You can reach the person managing the list at
+>        tracer-user-owner at lists.berlios.de
+>
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of Tracer-user digest..."
+>
+>
+> Today's Topics:
+>
+>   1. Re: Tracer v0.2 (Yosef Meller)
+>
+>
+> ----------------------------------------------------------------------
+>
+> Message: 1
+> Date: Sun, 23 May 2010 16:43:30 +0300
+> From: Yosef Meller <yosefm at gmail.com>
+> To: tracer-user at lists.berlios.de
+> Subject: Re: [Tracer-user] Tracer v0.2
+> Message-ID:
+>        <AANLkTinQI_V5y-5tuVR2X9h0HF6QrriLb6vNLG-dOele at mail.gmail.com>
+> Content-Type: text/plain; charset=ISO-8859-1
+>
+> Continuing the conversation on the mailing list, as we agreed.
+>
+> On the geometry side, I see two designs: one with rectangular
+> surfaces, which can be done by code already in Tracer (I assume that
+> these surfaces are flat); the other has (I think) a rhombus shape,
+> which will need to be programmed, but it's not too hard, you can take
+> a look at tracer.flat_surface.RectPlate to see what it takes.
+>
+> If you need the surfaces enclosing the splitter, they look like they
+> are some polygons for which a flat polygon geometry needs to be
+> written - basically write a point-in-polygon function (I have
+> references for you) and use it to vett out points from those hitting
+> an infinite flat surface, like what's being done in RectPlate.
+>
+> Optics: it looks like you are looking for refractive surfaces, am I
+> right? In that case, if the dependence on wavelength can be neglected,
+> you have what you need in Tracer. Otherwise, it will be a bit of work
+> to extend optics_callables.Refractive and RayBundle, but not too big a
+> deal.
+>
+> Once you have the geometry and optics for the surfaces, all the rest
+> is ready, you just need to assemble it to surfaces and an optical
+> object, in the process described here:
+> http://tracer.berlios.de/opt_sys_construct.html
+>
+> If you have a publicly accessible version of your Matlab code, I can
+> take a look.
+>
+> Yours,
+> Yosef.
+>
+> On Sat, May 22, 2010 at 8:27 PM, Alex Liberzon <alexlib at eng.tau.ac.il>
+> wrote:
+> > Dear Yossef,
+> > Great job is your Tracer?http://tracer.berlios.de/
+> > I discussed with Mark some time ago your 1st version and it seems that we
+> > can make great use of your project for our needs The project we're
+> pushing
+> > through is related to the optical system for the particle tracking
+> system,
+> > in which we need what we call 'four-view-image-splitter'. Could you
+> please,
+> > take a look at the attached images and tell me if you see how quickly we
+> > could adopt your package for our needs? Our matlab toolbox does it's job
+> but
+> > it's a bit cumbersome and not as professionally written as yours.
+> > http://picasaweb.google.com/alex.tkfx/ImageSplitter02#
+> >
+> > Thanks,
+> > Alex
+> > --
+> > Alex Liberzon
+> > Turbulence Structure Laboratory (http://www.eng.tau.ac.il/efdl)
+> > School of Mechanical Engineering
+> > Tel Aviv University
+> > Tel: +972-3-640-8928 (office)
+> > Tel: +972-3-640-6860 (lab)
+> > E-mail: alexlib at eng.tau.ac.il
+> >
+>
+>
+> ------------------------------
+>
+> _______________________________________________
+> Tracer-user mailing list
+> Tracer-user at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/tracer-user
+>
+>
+> End of Tracer-user Digest, Vol 1, Issue 2
+> *****************************************
+>
+
+
+
+-- 
+Alex Liberzon
+Turbulence Structure Laboratory (http://www.eng.tau.ac.il/efdl)
+School of Mechanical Engineering
+Tel Aviv University
+Tel: +972-3-640-8928 (office)
+Tel: +972-3-640-6860 (lab)
+E-mail: alexlib at eng.tau.ac.il
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/tracer-user/attachments/20100524/a2c77eae/attachment.html>
+
+From yosefm at gmail.com  Tue May 25 08:35:58 2010
+From: yosefm at gmail.com (Yosef Meller)
+Date: Tue, 25 May 2010 09:35:58 +0300
+Subject: [Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+In-Reply-To: <AANLkTimu0nUV7ZxOGmZADoQW5dFQWRsxszYkZMc1rm8x@mail.gmail.com>
+References: <mailman.53.1274695208.30415.tracer-user@lists.berlios.de>
+	<AANLkTimu0nUV7ZxOGmZADoQW5dFQWRsxszYkZMc1rm8x@mail.gmail.com>
+Message-ID: <AANLkTinuGdJ0pc3Q2DR1BvoEErUZue05ThAyCigoOeGE@mail.gmail.com>
+
+On Mon, May 24, 2010 at 8:35 PM, Alex Liberzon <alexlib at eng.tau.ac.il> wrote:
+> Regarding the system we're looking at - everything is built from flat
+> surfaces. the so-called 'rhombus' shape is also a combination of 4 flat
+> surfaces that are just aligned at specific angles.
+>
+> What we need is actually some help to design the first prototype - the
+> tutorial is not helpful for us at the present level. If you'll have a demo
+> that shows a list of the following items:
+
+Until I can allocate the time to do a full demo, I'll try to help you
+with the separate items.
+
+> 1. a point source of light, monochromatic, a point from which the ray comes
+> out.
+
+To create a general source, you create a RayBundle object, which is
+still only documented in the source (tracer/ray_bundle.py), I'll fix
+that soon. A ray bundle gets as parameters at least a (3,n) array of
+vertices (starting positions) for n rays; and a similar array of
+directions. So you would do something like that:
+
+import numpy as np
+from tracer.ray_bundle import RayBundle
+
+directs = your_preferred_distribution()
+point_source = N.c_[[src_x, src_y, src_z]]
+num_rays = 1000 # or however many you want.
+pos = np.tile(point_source, (num_rays, 1))
+energy = np.ones(num_rays)
+
+# And finally:
+source = RayBundle(pos, direct, energy=energy)
+
+> 2. a first mirror that sees the light at some angle (back mirrors)
+> 3. a second mirror that sees the first mirror (one of the four surfaces on
+> the rhombic surface)
+
+You didn't answer my question on the optics, I still didn't get
+whether it's actual mirrors (reflective surfaces) or refractive
+surfaces. If it's a reflective surface you can use
+tracer.models.one_sided_mirror.rect_one_sided_mirror. Refracrive,
+something like this:
+
+############
+from tracer.surface import Surface
+from tracer.flat_surface import RectPlate
+from tracer.object import AssembledObject
+import tracer.optics_callables as opt
+
+# Back surface:
+back = Surface(RectPlate(width, height), opt.Refractive(n1=1, n2=1.5))
+# 4 Facets:
+facets = [back]
+for loc in facet_locations: # locations relative to back surface
+    rot = ... # 3x3 rotation matrix, remembering the surface's normal
+is the local Z axis
+    facet = Surface(RectPlate(width, height), opt.Refractive(n1=1, n2=1.5),
+        location=loc, rotation=rot)
+    facets.append(facet)
+
+# All together now:
+fourview = AssembledObject(facets)
+################3
+
+This you put into an assembly (tracer.assembly.Assembly) with an
+object for the system and objects for the cameras.
+
+> 4. a light detector (a camera).
+
+Take a look at tracer.models.one_sided_mirror.rect_one_sided_receiver,
+or at tracer.optics_callables.ReflectiveReceiver.
+
+As to the process of performing a trace with that assembly, there's an
+elaborate example in examples/tower_gui.py in _fmap_btn_fired().
+
+> Then our design is actually a replication of this design 4 times, when every
+> time the point source is coming from another corner of a rectangle and what
+> we want to see is the point where the light hits when it originates from the
+> four different corners of the rectangle.
+> Thanks in advance,
+
+No problem. Again, I know the documentation needs some work, but I
+hope this helps in the meantime.
+
+

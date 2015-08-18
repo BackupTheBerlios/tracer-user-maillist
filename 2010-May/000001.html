@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Tracer-user] Tracer v0.2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/tracer-user/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:tracer-user%40lists.berlios.de?Subject=Re%3A%20%5BTracer-user%5D%20Tracer%20v0.2&In-Reply-To=%3CAANLkTinQI_V5y-5tuVR2X9h0HF6QrriLb6vNLG-dOele%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000000.html">
+   <LINK REL="Next"  HREF="000002.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Tracer-user] Tracer v0.2</H1>
+    <B>Yosef Meller</B> 
+    <A HREF="mailto:tracer-user%40lists.berlios.de?Subject=Re%3A%20%5BTracer-user%5D%20Tracer%20v0.2&In-Reply-To=%3CAANLkTinQI_V5y-5tuVR2X9h0HF6QrriLb6vNLG-dOele%40mail.gmail.com%3E"
+       TITLE="[Tracer-user] Tracer v0.2">yosefm at gmail.com
+       </A><BR>
+    <I>Sun May 23 15:43:30 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000000.html">[Tracer-user] Announcing Tracer v0.2
+</A></li>
+        <LI>Next message: <A HREF="000002.html">[Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Continuing the conversation on the mailing list, as we agreed.
+
+On the geometry side, I see two designs: one with rectangular
+surfaces, which can be done by code already in Tracer (I assume that
+these surfaces are flat); the other has (I think) a rhombus shape,
+which will need to be programmed, but it's not too hard, you can take
+a look at tracer.flat_surface.RectPlate to see what it takes.
+
+If you need the surfaces enclosing the splitter, they look like they
+are some polygons for which a flat polygon geometry needs to be
+written - basically write a point-in-polygon function (I have
+references for you) and use it to vett out points from those hitting
+an infinite flat surface, like what's being done in RectPlate.
+
+Optics: it looks like you are looking for refractive surfaces, am I
+right? In that case, if the dependence on wavelength can be neglected,
+you have what you need in Tracer. Otherwise, it will be a bit of work
+to extend optics_callables.Refractive and RayBundle, but not too big a
+deal.
+
+Once you have the geometry and optics for the surfaces, all the rest
+is ready, you just need to assemble it to surfaces and an optical
+object, in the process described here:
+<A HREF="http://tracer.berlios.de/opt_sys_construct.html">http://tracer.berlios.de/opt_sys_construct.html</A>
+
+If you have a publicly accessible version of your Matlab code, I can
+take a look.
+
+Yours,
+Yosef.
+
+On Sat, May 22, 2010 at 8:27 PM, Alex Liberzon &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/tracer-user">alexlib at eng.tau.ac.il</A>&gt; wrote:
+&gt;<i> Dear Yossef,
+</I>&gt;<i> Great job is your Tracer&#160;<A HREF="http://tracer.berlios.de/">http://tracer.berlios.de/</A>
+</I>&gt;<i> I discussed with Mark some time ago your 1st version and it seems that we
+</I>&gt;<i> can make great use of your project for our needs The project we're pushing
+</I>&gt;<i> through is related to the optical system for the particle tracking system,
+</I>&gt;<i> in which we need what we call 'four-view-image-splitter'. Could you please,
+</I>&gt;<i> take a look at the attached images and tell me if you see how quickly we
+</I>&gt;<i> could adopt your package for our needs? Our matlab toolbox does it's job but
+</I>&gt;<i> it's a bit cumbersome and not as professionally written as yours.
+</I>&gt;<i> <A HREF="http://picasaweb.google.com/alex.tkfx/ImageSplitter02#">http://picasaweb.google.com/alex.tkfx/ImageSplitter02#</A>
+</I>&gt;<i>
+</I>&gt;<i> Thanks,
+</I>&gt;<i> Alex
+</I>&gt;<i> --
+</I>&gt;<i> Alex Liberzon
+</I>&gt;<i> Turbulence Structure Laboratory (<A HREF="http://www.eng.tau.ac.il/efdl">http://www.eng.tau.ac.il/efdl</A>)
+</I>&gt;<i> School of Mechanical Engineering
+</I>&gt;<i> Tel Aviv University
+</I>&gt;<i> Tel: +972-3-640-8928 (office)
+</I>&gt;<i> Tel: +972-3-640-6860 (lab)
+</I>&gt;<i> E-mail: <A HREF="https://lists.berlios.de/mailman/listinfo/tracer-user">alexlib at eng.tau.ac.il</A>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000000.html">[Tracer-user] Announcing Tracer v0.2
+</A></li>
+	<LI>Next message: <A HREF="000002.html">[Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/tracer-user">More information about the Tracer-user
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/tracer-user/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:tracer-user%40lists.berlios.de?Subject=Re%3A%20%5BTracer-user%5D%20Tracer-user%20Digest%2C%20Vol%201%2C%20Issue%202&In-Reply-To=%3CAANLkTinuGdJ0pc3Q2DR1BvoEErUZue05ThAyCigoOeGE%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000002.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Tracer-user] Tracer-user Digest, Vol 1, Issue 2</H1>
+    <B>Yosef Meller</B> 
+    <A HREF="mailto:tracer-user%40lists.berlios.de?Subject=Re%3A%20%5BTracer-user%5D%20Tracer-user%20Digest%2C%20Vol%201%2C%20Issue%202&In-Reply-To=%3CAANLkTinuGdJ0pc3Q2DR1BvoEErUZue05ThAyCigoOeGE%40mail.gmail.com%3E"
+       TITLE="[Tracer-user] Tracer-user Digest, Vol 1, Issue 2">yosefm at gmail.com
+       </A><BR>
+    <I>Tue May 25 08:35:58 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000002.html">[Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Mon, May 24, 2010 at 8:35 PM, Alex Liberzon &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/tracer-user">alexlib at eng.tau.ac.il</A>&gt; wrote:
+&gt;<i> Regarding the system we're looking at - everything is built from flat
+</I>&gt;<i> surfaces. the so-called 'rhombus' shape is also a combination of 4 flat
+</I>&gt;<i> surfaces that are just aligned at specific angles.
+</I>&gt;<i>
+</I>&gt;<i> What we need is actually some help to design the first prototype - the
+</I>&gt;<i> tutorial is not helpful for us at the present level. If you'll have a demo
+</I>&gt;<i> that shows a list of the following items:
+</I>
+Until I can allocate the time to do a full demo, I'll try to help you
+with the separate items.
+
+&gt;<i> 1. a point source of light, monochromatic, a point from which the ray comes
+</I>&gt;<i> out.
+</I>
+To create a general source, you create a RayBundle object, which is
+still only documented in the source (tracer/ray_bundle.py), I'll fix
+that soon. A ray bundle gets as parameters at least a (3,n) array of
+vertices (starting positions) for n rays; and a similar array of
+directions. So you would do something like that:
+
+import numpy as np
+from tracer.ray_bundle import RayBundle
+
+directs = your_preferred_distribution()
+point_source = N.c_[[src_x, src_y, src_z]]
+num_rays = 1000 # or however many you want.
+pos = np.tile(point_source, (num_rays, 1))
+energy = np.ones(num_rays)
+
+# And finally:
+source = RayBundle(pos, direct, energy=energy)
+
+&gt;<i> 2. a first mirror that sees the light at some angle (back mirrors)
+</I>&gt;<i> 3. a second mirror that sees the first mirror (one of the four surfaces on
+</I>&gt;<i> the rhombic surface)
+</I>
+You didn't answer my question on the optics, I still didn't get
+whether it's actual mirrors (reflective surfaces) or refractive
+surfaces. If it's a reflective surface you can use
+tracer.models.one_sided_mirror.rect_one_sided_mirror. Refracrive,
+something like this:
+
+############
+from tracer.surface import Surface
+from tracer.flat_surface import RectPlate
+from tracer.object import AssembledObject
+import tracer.optics_callables as opt
+
+# Back surface:
+back = Surface(RectPlate(width, height), opt.Refractive(n1=1, n2=1.5))
+# 4 Facets:
+facets = [back]
+for loc in facet_locations: # locations relative to back surface
+    rot = ... # 3x3 rotation matrix, remembering the surface's normal
+is the local Z axis
+    facet = Surface(RectPlate(width, height), opt.Refractive(n1=1, n2=1.5),
+        location=loc, rotation=rot)
+    facets.append(facet)
+
+# All together now:
+fourview = AssembledObject(facets)
+################3
+
+This you put into an assembly (tracer.assembly.Assembly) with an
+object for the system and objects for the cameras.
+
+&gt;<i> 4. a light detector (a camera).
+</I>
+Take a look at tracer.models.one_sided_mirror.rect_one_sided_receiver,
+or at tracer.optics_callables.ReflectiveReceiver.
+
+As to the process of performing a trace with that assembly, there's an
+elaborate example in examples/tower_gui.py in _fmap_btn_fired().
+
+&gt;<i> Then our design is actually a replication of this design 4 times, when every
+</I>&gt;<i> time the point source is coming from another corner of a rectangle and what
+</I>&gt;<i> we want to see is the point where the light hits when it originates from the
+</I>&gt;<i> four different corners of the rectangle.
+</I>&gt;<i> Thanks in advance,
+</I>
+No problem. Again, I know the documentation needs some work, but I
+hope this helps in the meantime.
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000002.html">[Tracer-user] Tracer-user Digest, Vol 1, Issue 2
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/tracer-user">More information about the Tracer-user
+mailing list</a><br>
+</body></html>
